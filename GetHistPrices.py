@@ -68,7 +68,7 @@ def main():
     # Generate filename: instrument_timeframe_minutes.csv
     instrument_clean = str_instrument.replace('/', '')
     minutes = timeframe_minutes.get(str_timeframe, str_timeframe)
-    csv_filename = f"{instrument_clean}_{str_timeframe}_{minutes}.csv"
+    csv_filename = f"{instrument_clean}_{minutes}.csv"
     csv_path = os.path.join(output_folder, csv_filename)
 
     with ForexConnect() as fx:
@@ -82,18 +82,19 @@ def main():
             history = fx.get_history(str_instrument, str_timeframe, date_from, date_to, quotes_count)
             current_unit, _ = ForexConnect.parse_timeframe(str_timeframe)
            
-            date_format = '%m.%d.%Y %H:%M:%S'
+            date_format = '%Y.%m.%d %H:%M:%S'
             
             # Convert history to pandas DataFrame and write to CSV
             if current_unit == fxcorepy.O2GTimeFrameUnit.TICK:
                 data = []
                 for row in history:
                     data.append({
-                        'Date': pd.to_datetime(str(row['Date'])).strftime(date_format),
-                        'Bid': row['Bid'],
-                        'Ask': row['Ask']
+                        'DateTime': pd.to_datetime(str(row['Date'])).strftime(date_format),
+                        'Bid': round(row['Bid'], 5),
+                        'Ask': round(row['Ask'], 5)
                     })
-                df = pd.DataFrame(data)
+                df = pd.DataFrame(data, columns=['DateTime', 'Bid', 'Ask'])
+                df = df.sort_values('DateTime', ascending=False)
                 df.to_csv(csv_path, index=False)
                 print(f"Tick data written to: {csv_path}")
                 print(f"Records: {len(df)}")
@@ -101,14 +102,15 @@ def main():
                 data = []
                 for row in history:
                     data.append({
-                        'Date': pd.to_datetime(str(row['Date'])).strftime(date_format),
-                        'BidOpen': row['BidOpen'],
-                        'BidHigh': row['BidHigh'],
-                        'BidLow': row['BidLow'],
-                        'BidClose': row['BidClose'],
+                        'DateTime': pd.to_datetime(str(row['Date'])).strftime(date_format),
+                        'Open': round(row['BidOpen'], 5),
+                        'High': round(row['BidHigh'], 5),
+                        'Low': round(row['BidLow'], 5),
+                        'Close': round(row['BidClose'], 5),
                         'Volume': row['Volume']
                     })
-                df = pd.DataFrame(data)
+                df = pd.DataFrame(data, columns=['DateTime', 'Open', 'High', 'Low', 'Close', 'Volume'])
+                df = df.sort_values('DateTime', ascending=False)
                 df.to_csv(csv_path, index=False)
                 print(f"Price history written to: {csv_path}")
                 print(f"Records: {len(df)}")
