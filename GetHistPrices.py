@@ -44,10 +44,9 @@ def parse_args():
                         required=True,
                         help='Output folder path for CSV file.')
     parser.add_argument('--need_more_features',
-                        metavar="NEED_MORE_FEATURES",
-                        type=bool,
+                        type=lambda x: x.lower() in ('true', '1', 'yes'),
                         default=True,
-                        help='Need more features (default: True).')
+                        help='Need more features (default: True). Use --need_more_features false to skip.')
     parser.add_argument('--sma',
                         metavar="SMA_PERIOD",
                         type=int,
@@ -402,6 +401,9 @@ def main():
                     df['OBV'] = calculate_obv(df['Close'], df['Volume'])
                     df['SMA'] = df['Close'].rolling(window=sma_period).mean().round(5)
                     df['EMA'] = calculate_ema(df['Close'], ema_period)
+                else:
+                    print("No more features requested")
+                    
                 # Filter to original date_from (remove buffer period)
                 if date_from:
                     # Convert to tz-naive for comparison
