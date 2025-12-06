@@ -395,7 +395,7 @@ def main():
                 if need_more_features:
                     df['ATR'] = calculate_atr(df['High'], df['Low'], df['Close'], atr_period)
                     df['RSI'] = calculate_rsi(df['Close'], rsi_period)
-                    df['MACD_line'], df['MACD_histogram'], df['MACD_signal'] = calculate_macd(df['Close'], macd_fast_period, macd_slow_period, macd_signal_period)
+                    df['MACD'], df['MACD_Hist'], df['MACD_Signal'] = calculate_macd(df['Close'], macd_fast_period, macd_slow_period, macd_signal_period)
                     df['PSAR'] = calculate_psar(df['High'], df['Low'], df['Close'], af_start=psar_af_start, af_step=psar_af_step, af_max=psar_af_max)
                     df['BB_Middle'], df['BB_Upper'], df['BB_Lower'] = calculate_bollinger_bands(df['Close'], period=bb_period, sigma=bb_sigma)
                     df['OBV'] = calculate_obv(df['Close'], df['Volume'])
